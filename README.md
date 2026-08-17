@@ -2,6 +2,7 @@
 
 > An interactive, real-time browser tool for visualizing and comparing JavaScript execution timing and event rate control patterns: **Debounce**, **Throttle**, **Rate Limit**, **Async Queue**, and **Batching**.
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/atapas/execution-timing-simulator)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-analyzer.tapascript.io-teal?style=for-the-badge&logo=vercel)](https://analyzer.tapascript.io/)
 [![React 19](https://img.shields.io/badge/React-19.x-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)

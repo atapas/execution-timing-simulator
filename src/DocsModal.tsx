@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { GithubIcon } from '@/components/GithubIcon';
 
 interface DocsModalProps {
   isOpen: boolean;
@@ -291,12 +292,23 @@ export function DocsModal({ isOpen, onClose }: DocsModalProps) {
               tapaScript
             </a>
           </p>
-          <button
-            onClick={onClose}
-            className="text-xs text-zinc-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800"
-          >
-            Close
-          </button>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/atapas/execution-timing-simulator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-3 py-1.5 rounded-lg font-medium cursor-pointer"
+            >
+              <GithubIcon className="w-3.5 h-3.5 text-teal-400" />
+              <span>Contribute on GitHub</span>
+            </a>
+            <button
+              onClick={onClose}
+              className="text-xs text-zinc-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800 cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, BookOpen } from 'lucide-react';
 import { CanvasTimeline, TimelineEvent, PatternType } from './CanvasTimeline';
 import { DocsModal } from './DocsModal';
+import { GithubIcon } from '@/components/GithubIcon';
 
 export function ExecutionSimulator() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
@@ -118,7 +119,7 @@ export function ExecutionSimulator() {
   return (
     <div className="max-w-5xl mx-auto p-8 bg-zinc-950 text-white min-h-screen flex flex-col justify-between">
       <div className="grow">
-        {/* Prominent Header with Primary Documentation Action */}
+        {/* Prominent Header with Primary Documentation & GitHub Actions */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
           <div>
             <h1 className="text-3xl font-bold mb-2 tracking-tight text-white flex items-center gap-3">
@@ -129,13 +130,26 @@ export function ExecutionSimulator() {
             </p>
           </div>
 
-          <Button 
-            onClick={() => setShowDoc(true)}
-            className="cursor-pointer shrink-0 bg-teal-950/40 hover:bg-teal-900/60 border border-teal-500/40 hover:border-teal-400 text-teal-300 hover:text-white px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm font-semibold"
-          >
-            <BookOpen className="h-4 w-4 text-teal-400" />
-            Pattern Documentation
-          </Button>
+          <div className="flex items-center gap-3 shrink-0">
+            <a
+              href="https://github.com/atapas/execution-timing-simulator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 hover:border-zinc-500 text-zinc-200 hover:text-white px-3.5 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm font-semibold"
+              title="View source code and contribute on GitHub"
+            >
+              <GithubIcon className="h-4 w-4 text-zinc-300" />
+              <span>GitHub</span>
+            </a>
+
+            <Button 
+              onClick={() => setShowDoc(true)}
+              className="cursor-pointer bg-teal-950/40 hover:bg-teal-900/60 border border-teal-500/40 hover:border-teal-400 text-teal-300 hover:text-white px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm font-semibold"
+            >
+              <BookOpen className="h-4 w-4 text-teal-400" />
+              Pattern Documentation
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:items-stretch">
@@ -224,8 +238,8 @@ export function ExecutionSimulator() {
                 </div>
               </div>
 
-              {/* Sidebar Secondary Resource Button */}
-              <div className="mt-8 pt-6 border-t border-zinc-800/80">
+              {/* Sidebar Secondary Resource Buttons */}
+              <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-3">
                 <Button 
                   onClick={() => setShowDoc(true)}
                   className="w-full bg-teal-950/30 hover:bg-teal-900/50 border border-teal-800/60 hover:border-teal-500/60 text-teal-300 hover:text-white cursor-pointer flex items-center justify-center gap-2 h-11 text-xs font-semibold rounded-xl transition-all shadow-sm"
@@ -233,6 +247,16 @@ export function ExecutionSimulator() {
                   <BookOpen className="h-4 w-4 text-teal-400 shrink-0" />
                   Pattern Docs & Guide
                 </Button>
+
+                <a
+                  href="https://github.com/atapas/execution-timing-simulator"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-zinc-950/50 hover:bg-zinc-800/60 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white cursor-pointer flex items-center justify-center gap-2 h-11 text-xs font-semibold rounded-xl transition-all shadow-sm"
+                >
+                  <GithubIcon className="h-4 w-4 text-zinc-300 shrink-0" />
+                  Contribute on GitHub
+                </a>
               </div>
             </div>
           </div>
@@ -251,7 +275,7 @@ export function ExecutionSimulator() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 pt-6 border-t border-zinc-800 text-center text-sm text-zinc-500">
+      <footer className="mt-12 pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
         <p>
           Made with love by{' '}
           <a
@@ -264,6 +288,15 @@ export function ExecutionSimulator() {
           </a>
           . Learn how Senior Devs think.
         </p>
+        <a
+          href="https://github.com/atapas/execution-timing-simulator"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-zinc-300 hover:text-white transition-colors text-xs font-semibold bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-3.5 py-2 rounded-xl shadow-sm cursor-pointer"
+        >
+          <GithubIcon className="h-4 w-4 text-teal-400" />
+          <span>Star & Contribute on GitHub</span>
+        </a>
       </footer>
       {
         showDoc && (
