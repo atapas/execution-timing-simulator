@@ -10,13 +10,25 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, BookOpen } from 'lucide-react';
 import { CanvasTimeline, TimelineEvent, PatternType } from './CanvasTimeline';
 import { DocsModal } from './DocsModal';
-import { GithubIcon } from '@/components/GithubIcon';
+import { StrategyConfig, StrategyConfiguration } from './StrategyConfig';
+import { GithubIcon } from "@/components/GithubIcon";
+
+const DEFAULT_STRATEGY_CONFIG: StrategyConfiguration = {
+  debounceWait: 500,
+  throttleWait: 500,
+  rateLimitCount: 3,
+  rateLimitWindow: 2000,
+  batchMaxSize: 5,
+  batchMaxWait: 1000,
+  queueConcurrency: 1,
+};
 
 export function ExecutionSimulator() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [windowMs, setWindowMs] = useState(6000);
   const [isPaused, setIsPaused] = useState(false);
   const [showDoc, setShowDoc] = useState(false);
+  const [strategyConfig, setStrategyConfig] = useState<StrategyConfiguration>(DEFAULT_STRATEGY_CONFIG);
 
   // Refs for tracking pause duration offsets
   const isPausedRef = useRef(isPaused);
@@ -49,19 +61,19 @@ export function ExecutionSimulator() {
   // 1. Debounce
   const handleDebounce = useDebouncedCallback(
     useCallback((tTime?: number) => logEvent('debounce', tTime), [logEvent]), 
-    { wait: 500 }
+    { wait: strategyConfig.debounceWait }
   );
 
   // 2. Throttle
   const handleThrottle = useThrottledCallback(
     useCallback((tTime?: number) => logEvent('throttle', tTime), [logEvent]), 
-    { wait: 500 }
+    { wait: strategyConfig.throttleWait }
   );
 
   // 3. Rate Limit
   const handleRateLimit = useRateLimitedCallback(
     useCallback((tTime?: number) => logEvent('rateLimit', tTime), [logEvent]), 
-    { limit: 3, window: 2000 }
+    { limit: strategyConfig.rateLimitCount, window: strategyConfig.rateLimitWindow }
   );
 
   // 4. Queue
@@ -77,7 +89,7 @@ export function ExecutionSimulator() {
     await new Promise(resolve => setTimeout(resolve, 400)); 
   }, [logEvent]);
   
-  const handleQueue = useAsyncQueuer(processQueue, { concurrency: 1, started: true });
+  const handleQueue = useAsyncQueuer(processQueue, { concurrency: strategyConfig.queueConcurrency, started: true });
 
   // 5. Batch
   const processBatch = useCallback(async (items: string[]) => {
@@ -93,7 +105,11 @@ export function ExecutionSimulator() {
     logEvent('batch', tTime);
   }, [logEvent]);
 
-  const handleBatch = useBatcher(processBatch, { maxSize: 5, wait: 1000, started: true });
+  const handleBatch = useBatcher(processBatch, {
+    maxSize: strategyConfig.batchMaxSize,
+    wait: strategyConfig.batchMaxWait,
+    started: true,
+  });
 
   // The Master Trigger
   const triggerAll = () => {
@@ -126,7 +142,8 @@ export function ExecutionSimulator() {
               Execution Timing Simulator
             </h1>
             <p className="text-zinc-400 text-sm">
-              Click rapidly to see how different architectural patterns handle high-frequency events.
+              Click rapidly to see how different architectural patterns handle
+              high-frequency events.
             </p>
           </div>
 
@@ -142,7 +159,7 @@ export function ExecutionSimulator() {
               <span>GitHub</span>
             </a>
 
-            <Button 
+            <Button
               onClick={() => setShowDoc(true)}
               className="cursor-pointer bg-teal-950/40 hover:bg-teal-900/60 border border-teal-500/40 hover:border-teal-400 text-teal-300 hover:text-white px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm font-semibold"
             >
@@ -154,21 +171,21 @@ export function ExecutionSimulator() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:items-stretch">
           {/* Controls Panel */}
-          <div className="md:col-span-1 flex flex-col h-full">
-            <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl shadow-lg flex flex-col justify-between flex-1 h-full">
+          <div className="md:col-span-1 relative flex flex-col">
+            <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl shadow-lg flex flex-col flex-1 overflow-y-auto md:absolute md:inset-0">
               <div>
                 <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider mb-4">
                   Controls
                 </h2>
-                
-                <Button 
+
+                <Button
                   onClick={triggerAll}
                   className="cursor-pointer w-full h-16 text-lg font-bold bg-teal-600 hover:bg-teal-500 active:scale-95 transition-all shadow-teal-900/20 shadow-xl mb-4"
                 >
                   Trigger Event
                 </Button>
 
-                <Button 
+                <Button
                   onClick={() => {
                     setIsPaused((prev) => {
                       const next = !prev;
@@ -179,7 +196,8 @@ export function ExecutionSimulator() {
                       } else {
                         // Accumulate the elapsed pause duration before resuming
                         if (pausedTimeRef.current !== null) {
-                          totalPausedDurationRef.current += Date.now() - pausedTimeRef.current;
+                          totalPausedDurationRef.current +=
+                            Date.now() - pausedTimeRef.current;
                           pausedTimeRef.current = null;
                         }
                       }
@@ -187,8 +205,8 @@ export function ExecutionSimulator() {
                     });
                   }}
                   className={`w-full h-12 text-sm font-semibold transition-all mb-4 gap-2 flex items-center justify-center cursor-pointer ${
-                    isPaused 
-                      ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-900/20 shadow-xl border border-transparent" 
+                    isPaused
+                      ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-900/20 shadow-xl border border-transparent"
                       : "border border-zinc-700 hover:bg-zinc-800 text-white bg-transparent"
                   }`}
                 >
@@ -204,8 +222,8 @@ export function ExecutionSimulator() {
                     </>
                   )}
                 </Button>
-                
-                <Button 
+
+                <Button
                   onClick={() => setEvents([])}
                   variant="outline"
                   className="w-full border-zinc-700 hover:bg-zinc-300 text-zinc-900 cursor-pointer"
@@ -223,12 +241,12 @@ export function ExecutionSimulator() {
                       {windowMs / 1000}s
                     </span>
                   </div>
-                  <input 
-                    type="range" 
-                    min="2000" 
-                    max="15000" 
+                  <input
+                    type="range"
+                    min="2000"
+                    max="15000"
                     step="1000"
-                    value={windowMs} 
+                    value={windowMs}
                     onChange={(e) => setWindowMs(Number(e.target.value))}
                     className="w-full accent-teal-500 cursor-pointer"
                   />
@@ -236,11 +254,19 @@ export function ExecutionSimulator() {
                     Adjust how much history is visible on screen.
                   </p>
                 </div>
+
+                {/* Strategy Configuration */}
+                <div className="mt-8">
+                  <StrategyConfig
+                    config={strategyConfig}
+                    onChange={setStrategyConfig}
+                  />
+                </div>
               </div>
 
               {/* Sidebar Secondary Resource Buttons */}
               <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-3">
-                <Button 
+                <Button
                   onClick={() => setShowDoc(true)}
                   className="w-full bg-teal-950/30 hover:bg-teal-900/50 border border-teal-800/60 hover:border-teal-500/60 text-teal-300 hover:text-white cursor-pointer flex items-center justify-center gap-2 h-11 text-xs font-semibold rounded-xl transition-all shadow-sm"
                 >
@@ -262,10 +288,10 @@ export function ExecutionSimulator() {
           </div>
 
           {/* Timeline Visualization Panel */}
-          <div className="md:col-span-3 flex flex-col h-full">
-            <CanvasTimeline 
-              events={events} 
-              windowMs={windowMs} 
+          <div className="md:col-span-3 flex flex-col">
+            <CanvasTimeline
+              events={events}
+              windowMs={windowMs}
               isPaused={isPaused}
               pausedTimeRef={pausedTimeRef}
               totalPausedDurationRef={totalPausedDurationRef}
@@ -277,7 +303,7 @@ export function ExecutionSimulator() {
       {/* Footer */}
       <footer className="mt-12 pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
         <p>
-          Made with love by{' '}
+          Made with love by{" "}
           <a
             href="https://youtube.com/@tapasadhikary"
             target="_blank"
@@ -298,11 +324,9 @@ export function ExecutionSimulator() {
           <span>Star & Contribute on GitHub</span>
         </a>
       </footer>
-      {
-        showDoc && (
-          <DocsModal isOpen={showDoc} onClose={() => setShowDoc(false)} />
-        )
-      }
+      {showDoc && (
+        <DocsModal isOpen={showDoc} onClose={() => setShowDoc(false)} />
+      )}
     </div>
   );
 }
